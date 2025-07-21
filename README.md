@@ -4,7 +4,7 @@ Converts fluka userdump output into an lhe file
 ## Modifying the fluka input card
 Will update later
 
-## Running fluka with flair
+## Modifying the mgdraw.f routine
 Will update later
 
 ## Running fluka in command line
