@@ -4,18 +4,18 @@
 FLUKA_PATH="/home/groups/laurenat/majd/fluka4-5.0"
 
 # Specifiy durectory where simulations are output
-TARGET_DIR="/home/groups/laurenat/majd/fluka_sims/test"
+TARGET_DIR="/home/groups/laurenat/majd/fluka_sims/3740_MeV"
 
 # Select mgdraw scripr and fluka inputcard to use
 mgdraw_script="mgdraw_phiKK.f"
-input_card="phiKK_3740_small.inp"
+input_card="phiKK_3740.inp"
 
 # Define the range for random seeds
 SEED_START=1	# Starting seed number
-SEED_END=10	# Ending seed number
+SEED_END=100	# Ending seed number
 
 # Define the number of statistically independent runs per seed
-Num_runs=1  # Set the desired number of runs here
+Num_runs=10  # Set the desired number of runs here
 
 # fluka2lhe filepath
 f2l_path="/home/groups/laurenat/majd/fluka2lhe"
@@ -25,7 +25,9 @@ sbatch_time="08:00:00" # Time limit (HH:MM:SS)
 sbatch_partition="normal"
 sbatch_ntasks="1"
 sbatch_cpus_per_task="1"
-sbatch_mem="4G"
+sbatch_mem="2G"
+
+#########################################################################################
 
 # Get current directory
 CURRENT_DIR=$(pwd)
