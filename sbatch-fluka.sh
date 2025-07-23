@@ -8,7 +8,7 @@ TARGET_DIR="/home/groups/laurenat/majd/fluka_sims/test"
 
 # Select mgdraw scripr and fluka inputcard to use
 mgdraw_script="mgdraw_phiKK.f"
-input_card="phiKK_4550.inp"
+input_card="phiKK_3740_small.inp"
 
 # Define the range for random seeds
 SEED_START=1	# Starting seed number

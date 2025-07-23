@@ -33,5 +33,5 @@ USERDUMP         100        90         0         1                    test_dump
 *Set the random number seed
 RANDOMIZ         1.0         1
 *Set the number of primary histories to be simulated in the run
-START        2000000
+START        2000000.
 STOP

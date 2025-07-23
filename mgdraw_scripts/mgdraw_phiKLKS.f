@@ -159,21 +159,21 @@
 *
       ENTRY USDRAW ( ICODE, MREG, XSCO, YSCO, ZSCO )
       IF (ICODE .EQ. 101) THEN
-          found_16 = .FALSE.
-          found_15 = .FALSE.
+          found_12 = .FALSE.
+          found_19 = .FALSE.
 
           ! Loop on GENSTCK and look for charged Kaons
           DO jp = np0 + 1, np
-              IF (kpart(jp) == 16) THEN
-                  found_16 = .TRUE.
+              IF (kpart(jp) == 12) THEN
+                  found_12 = .TRUE.
               ENDIF
-              IF (kpart(jp) == 15) THEN
-                  found_15 = .TRUE.
+              IF (kpart(jp) == 19) THEN
+                  found_19 = .TRUE.
               ENDIF
           END DO
 
-          ! If charged Kaons are found
-          IF (found_16 .AND. found_15) THEN
+          ! If long and short Kaons are found
+          IF (found_12 .AND. found_19) THEN
               ! Print projectile and interaction
               WRITE (90, *)
               WRITE (90, *) 'PROJECTILE: id = ', jtrack, 
