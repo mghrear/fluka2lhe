@@ -17,6 +17,9 @@ SEED_END=10	# Ending seed number
 # Define the number of statistically independent runs per seed
 Num_runs=1  # Set the desired number of runs here
 
+# Get current directory
+CURRENT_DIR=$(pwd)
+
 # Make target directory if it doesn't already exist
 if [ ! -d "$TARGET_DIR" ]; then
     mkdir $TARGET_DIR
@@ -41,7 +44,7 @@ for ((seed=SEED_START; seed<=SEED_END; seed++)); do
 	SEED_DIR="$TARGET_DIR/$seed"
 	mkdir -p "$SEED_DIR"  # Create the directory, -p ensures no error if it exists
 	cp "input_cards/$input_card" "$SEED_DIR"
-	sed -i "34s/.*/RANDOMIZ         1.0        $seed/" "$SEED_DIR/$input_card"
+	sed -i "34s/.*/RANDOMIZ         1.0    $seed./" "$SEED_DIR/$input_card"
 
 	# Print the created seed directory
 	echo "Created directory: $SEED_DIR"
@@ -54,5 +57,7 @@ for ((seed=SEED_START; seed<=SEED_END; seed++)); do
 
 done
 
+# Return to current directory
+cd $CURRENT_DIR 
 echo "All commands executed successfully."
 
