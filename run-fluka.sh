@@ -7,8 +7,8 @@ FLUKA_PATH="/home/groups/laurenat/majd/fluka4-5.0"
 TARGET_DIR="/home/groups/laurenat/majd/fluka2lhe/test4"
 
 # Define the files to copy
-FILE1="mgdraw_phiKK.f"
-FILE2="phiKK_4550.inp"
+mgdraw_script="mgdraw_phiKK.f"
+input_card="phiKK_4550.inp"
 
 # Define the range for random seeds
 SEED_START=1	# Starting seed number
@@ -23,16 +23,12 @@ if [ ! -d "$TARGET_DIR" ]; then
 fi
 
 # Copy the files to the target directory
-echo "Copying '$FILE1' to '$TARGET_DIR'..." 
-cp "$FILE1" "$TARGET_DIR"
-
-
-# Change to the target directory
-#cd "$TARGET_DIR" || { echo "Error: Failed to change directory to '$TARGET_DIR'.";}
+echo "Copying '$mgdraw_script' to '$TARGET_DIR'..." 
+cp "mgdraw_scripts/$mgdraw_script" "$TARGET_DIR"
 
 # Compile mgdraw.f routine
-echo "Running $FLUKA_PATH/bin/fff mgdraw_phiKK.f"
-$FLUKA_PATH/bin/fff $TARGET_DIR/mgdraw_phiKK.f
+echo "Running $FLUKA_PATH/bin/fff $mgdraw_script"
+$FLUKA_PATH/bin/fff $TARGET_DIR/$mgdraw_script
 
 # Create executable
 echo "Running $FLUKA_PATH/bin/lfluka -o mgdraw_phiKK.o"
@@ -44,17 +40,19 @@ for ((seed=SEED_START; seed<=SEED_END; seed++)); do
 	# Create a directory for each seed, copy the fluka input card there and update the random seed
 	SEED_DIR="$TARGET_DIR/$seed"
 	mkdir -p "$SEED_DIR"  # Create the directory, -p ensures no error if it exists
-	cp "$FILE2" "$SEED_DIR"
-	sed -i "34s/.*/RANDOMIZ         1.0       $seed/" "$SEED_DIR/$FILE2"
+	cp "input_cards/$input_card" "$SEED_DIR"
+	sed -i "34s/.*/RANDOMIZ         1.0        $seed/" "$SEED_DIR/$input_card"
 
 	# Print the created seed directory
 	echo "Created directory: $SEED_DIR"
 
+	# cd to seed directior
+	cd $SEED_DIR
+
 	echo "Running $FLUKA_PATH/bin/rfluka -e $TARGET_DIR/phiKK_exe $TARGET_DIR/phiKK_4550.inp -M $Num_runs"
-	$FLUKA_PATH/bin/rfluka -e $TARGET_DIR/phiKK_exe $TARGET_DIR/phiKK_4550.inp -M "$Num_runs"
+	$FLUKA_PATH/bin/rfluka -e $TARGET_DIR/phiKK_exe $SEED_DIR/phiKK_4550.inp -M "$Num_runs"
 
 done
-#$FLUKA_PATH/bin/rfluka -e $TARGET_DIR/phiKK_exe $TARGET_DIR/phiKK_4550.inp -M "$Num_runs"
 
 echo "All commands executed successfully."
 

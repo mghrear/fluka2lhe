@@ -1,0 +1,5 @@
+  *** The 2th field         6  of the following input card ***
+ RANDOMIZ         1.0        6                                                   
+  *** does not contain a valid formatted fortran real number!!! ***
+  *** It is ambiguous and it could be read differently on different compilers ***
+ *** depending whether it defaults or not to the blank=0 formatted input rule ***
