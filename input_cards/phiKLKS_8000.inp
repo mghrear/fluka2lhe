@@ -3,7 +3,7 @@ TITLE
 *Set the defaults for precision simulations
 DEFAULTS                                                              PRECISIO
 *Define the beam characteristics
-BEAM            4.55                                                  ELECTRON
+BEAM            8.00                                                  ELECTRON
 *Define the beam position
 BEAMPOS
 GEOBEGIN                                                              COMBNAME
@@ -33,5 +33,5 @@ USERDUMP         100        90         0         1                    test_dump
 *Set the random number seed
 RANDOMIZ         1.0
 *Set the number of primary histories to be simulated in the run
-START        2000000
+START        2000000.
 STOP
