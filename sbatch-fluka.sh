@@ -4,7 +4,7 @@
 FLUKA_PATH="/home/groups/laurenat/majd/fluka4-5.0"
 
 # Specifiy durectory where simulations are output
-TARGET_DIR="/home/groups/laurenat/majd/fluka2lhe/test4"
+TARGET_DIR="/home/groups/laurenat/majd/fluka_sims/test"
 
 # Select mgdraw scripr and fluka inputcard to use
 mgdraw_script="mgdraw_phiKK.f"
@@ -17,8 +17,15 @@ SEED_END=10	# Ending seed number
 # Define the number of statistically independent runs per seed
 Num_runs=1  # Set the desired number of runs here
 
-#fluka2lhe filepath
+# fluka2lhe filepath
 f2l_path="/home/groups/laurenat/majd/fluka2lhe"
+
+# Select sbatch settings
+sbatch_time="08:00:00" # Time limit (HH:MM:SS)
+sbatch_partition="normal"
+sbatch_ntasks="1"
+sbatch_cpus_per_task="1"
+sbatch_mem="4G"
 
 # Get current directory
 CURRENT_DIR=$(pwd)
@@ -59,12 +66,31 @@ for ((seed=SEED_START; seed<=SEED_END; seed++)); do
 	# cd to seed directior
 	cd $SEED_DIR
 
-	echo "Running $FLUKA_PATH/bin/rfluka -e $TARGET_DIR/$mgdraw_exe $TARGET_DIR/$input_card -M $Num_runs"
-	$FLUKA_PATH/bin/rfluka -e $TARGET_DIR/$mgdraw_exe $SEED_DIR/$input_card -M "$Num_runs"
+	# Create an SBATCH job script
+	JOB_SCRIPT="run_fluka_seed_${seed}.sh"
+	echo "#!/bin/bash" > $JOB_SCRIPT
+	echo "#SBATCH --job-name=fluka_seed_${seed}" >> $JOB_SCRIPT
+	echo "#SBATCH --output=${SEED_DIR}/fluka_seed_${seed}.out" >> $JOB_SCRIPT
+	echo "#SBATCH --error=${SEED_DIR}/fluka_seed_${seed}.err" >> $JOB_SCRIPT
+	echo "#SBATCH --time=$sbatch_time" >> $JOB_SCRIPT # Time limit (HH:MM:SS)
+	echo "#SBATCH --partition=$sbatch_partition" >> $JOB_SCRIPT
+	echo "#SBATCH --ntasks=$sbatch_ntasks" >> $JOB_SCRIPT
+	echo "#SBATCH --cpus-per-task=$sbatch_cpus_per_task" >> $JOB_SCRIPT
+	echo "#SBATCH --mem=$sbatch_mem" >> $JOB_SCRIPT
+
+	# Add the command to execute
+	echo "$FLUKA_PATH/bin/rfluka -e $TARGET_DIR/$mgdraw_exe $SEED_DIR/$input_card -M $Num_runs" >> $JOB_SCRIPT
+
+	# Make the job script executable
+	chmod +x $JOB_SCRIPT
+
+	# Submit the job
+	sbatch $JOB_SCRIPT
+
 
 done
 
 # Return to current directory
 cd $CURRENT_DIR 
-echo "All commands executed successfully."
+echo "All jobs submitted."
 
