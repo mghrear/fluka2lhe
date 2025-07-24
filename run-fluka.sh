@@ -20,6 +20,8 @@ Num_runs=1  # Set the desired number of runs here
 #fluka2lhe filepath
 f2l_path="/home/groups/laurenat/majd/fluka2lhe"
 
+#########################################################################################
+
 # Get current directory
 CURRENT_DIR=$(pwd)
 

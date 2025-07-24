@@ -59,7 +59,7 @@ def read_secondary_info(secondary_lines):
     return np.array(IDs), np.array(Ps), np.array(Xs), np.array(Ys), np.array(Zs)
 
 # Convert fluka userdump files into pandas dataframes
-def FlukaDump_toPandas(fluka_dir, N_files, Energy):
+def Fluka2Pandas(file_path):
 
     # Main loop to read files and extract data
     for i in np.arange(1,N_files+1,1):
@@ -71,7 +71,7 @@ def FlukaDump_toPandas(fluka_dir, N_files, Energy):
         # file name
         file_name = fluka_dir+"phiKK_"+str(Energy)+ i + "_fort.90"
 
-        with open(file_name, "r") as file:
+	with open(file_path, "r") as file:
             lines = file.readlines()
 
         CurrentLine = 0
@@ -112,7 +112,7 @@ def FlukaDump_toPandas(fluka_dir, N_files, Energy):
             else:
                 CurrentLine += 1
 
-        df.to_pickle(fluka_dir+"phiKK_"+str(Energy)+ i + ".pkl")
+        return df
 
 
 
