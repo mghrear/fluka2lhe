@@ -60,59 +60,50 @@ def read_secondary_info(secondary_lines):
 
 # Convert fluka userdump files into pandas dataframes
 def Fluka2Pandas(file_path):
-
-    # Main loop to read files and extract data
-    for i in np.arange(1,N_files+1,1):
-
-        df = pd.DataFrame()
-
-        # convert i to string with leading zeros
-        i = str(i).zfill(3)
-        # file name
-        file_name = fluka_dir+"phiKK_"+str(Energy)+ i + "_fort.90"
-
-	with open(file_path, "r") as file:
+    
+    # Open fluka fort.90 dump file and read lines
+    with open(file_path, "r") as file:
             lines = file.readlines()
 
-        CurrentLine = 0
-        TotLines = len(lines)
+    # Loop through the lines of the file and add information to pandas datafram
+    df = pd.DataFrame()
+    CurrentLine = 0
+    TotLines = len(lines)
+    while CurrentLine < TotLines:
 
-        while CurrentLine < TotLines:
+        #Read current line
+        line = lines[CurrentLine]
 
-            #Read current line
-            line = lines[CurrentLine]
+        if line[1:11] == 'PROJECTILE':
 
-            if line[1:11] == 'PROJECTILE':
+            ProjID, ProjkE, ProjdirX, ProjdirY, ProjdirZ, Gen_No, IntID, NoSecondary = read_event_info(lines[CurrentLine:CurrentLine+4])
 
-                ProjID, ProjkE, ProjdirX, ProjdirY, ProjdirZ, Gen_No, IntID, NoSecondary = read_event_info(lines[CurrentLine:CurrentLine+4])
+            IDs, Ps, Xs, Ys, Zs = read_secondary_info(lines[CurrentLine+4:CurrentLine+4+NoSecondary])
 
-                IDs, Ps, Xs, Ys, Zs = read_secondary_info(lines[CurrentLine+4:CurrentLine+4+NoSecondary])
+            df_row = pd.DataFrame({
+                'ProjID': [ProjID], 
+                'ProjkE': [ProjkE],
+                'ProjdirX': [ProjdirX],
+                'ProjdirY': [ProjdirY],
+                'ProjdirZ': [ProjdirZ],
+                'Gen_No': [Gen_No],
+                'IntID': [IntID],
+                'NoSecondary': [NoSecondary],
+                'IDs': [IDs],
+                'Ps': [Ps],
+                'dir_xs': [Xs],
+                'dir_ys': [Ys],
+                'dir_zs': [Zs]
+            })
 
-                temp_df = pd.DataFrame({
-                    'ProjID': [ProjID], 
-                    'ProjkE': [ProjkE],
-                    'ProjdirX': [ProjdirX],
-                    'ProjdirY': [ProjdirY],
-                    'ProjdirZ': [ProjdirZ],
-                    'Gen_No': [Gen_No],
-                    'IntID': [IntID],
-                    'NoSecondary': [NoSecondary],
-                    'IDs': [IDs],
-                    'Ps': [Ps],
-                    'Xs': [Xs],
-                    'Ys': [Ys],
-                    'Zs': [Zs]
-                })
+            # Add row to the dataframe
+            df = pd.concat([df, df_row], ignore_index=True)
 
-                # Append the temporary DataFrame to the main DataFrame
-                df = pd.concat([df, temp_df], ignore_index=True)
+            CurrentLine += 4 + NoSecondary  # Move to the next event block
 
-                CurrentLine += 4 + NoSecondary  # Move to the next event block
+        else: CurrentLine += 1
 
-            else:
-                CurrentLine += 1
-
-        return df
+    return df
 
 
 
