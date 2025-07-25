@@ -5,17 +5,15 @@ import os
 from pathlib import Path
 
 # Path of directory with fluka simulations to convert
-fluka_sim_dir = "/home/groups/laurenat/majd/fluka_sims/3740_MeV/"
+fluka_sim_dir = "/home/groups/laurenat/majd/fluka_sims/4550_MeV/"
 
 # Name of final feather file
-feather_name = "phiKK_3740_MeV"
+feather_name = "phiKK_4550_MeV"
 
 ####################################################################################
 
-
 # List all subdirectories, there should be a subdirectory for each seed
-#subdirs = [str(subdir) for subdir in Path(fluka_sim_dir).iterdir() if subdir.is_dir()]
-subdirs = ["/home/groups/laurenat/majd/fluka_sims/3740_MeV/1","/home/groups/laurenat/majd/fluka_sims/3740_MeV/2"]
+subdirs = [str(subdir) for subdir in Path(fluka_sim_dir).iterdir() if subdir.is_dir()]
 
 # Dataframe to store data
 df = pd.DataFrame()
@@ -42,4 +40,4 @@ for path in subdirs:
 		# Increment file counter
 		n_files += 1
 
-df.to_feather(fluka_sim_dir+feather_name+str(n_files)+".ftr")
+df.to_feather(fluka_sim_dir+feather_name+"_"+str(n_files)+"_files.ftr")

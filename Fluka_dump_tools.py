@@ -122,15 +122,20 @@ def convert_fluka_ids(ids):
     return np.array(pdg_ids), np.array(masses), np.array(charges)
 
 
-
 def find_files_with_extension(path, extension):
+    
     # List to hold the matching file paths
     files_with_extension = []
-    
-    # Walk through the directory
-    for root, dirs, files in os.walk(path):
-        for file in files:
-            if file.endswith(extension):
-                files_with_extension.append(os.path.join(root, file))
-    
+
+    # Check if the specified path is a directory
+    if not os.path.isdir(path):
+        raise ValueError(f"The provided path '{path}' is not a valid directory.")
+
+    # List all files in the specified directory
+    for file in os.listdir(path):
+        # Construct the full file path
+        file_path = os.path.join(path, file)
+        if os.path.isfile(file_path) and file.endswith(extension):
+            files_with_extension.append(file_path)
+
     return files_with_extension
