@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd 
+import os
 
 # Get PDG ID, Mass [GeV], and Charge from fluka particle ID
 flukaIDdict = {
@@ -122,4 +123,14 @@ def convert_fluka_ids(ids):
 
 
 
-
+def find_files_with_extension(path, extension):
+    # List to hold the matching file paths
+    files_with_extension = []
+    
+    # Walk through the directory
+    for root, dirs, files in os.walk(path):
+        for file in files:
+            if file.endswith(extension):
+                files_with_extension.append(os.path.join(root, file))
+    
+    return files_with_extension
