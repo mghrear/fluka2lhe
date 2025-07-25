@@ -1,5 +1,5 @@
 # fluka2lhe
-Converts fluka userdump output into an lhe file
+This repo uses fluka as a generator for photonuclear interactions. It provides input cards and user routines to simulate and dump photonuclear interactions including phi to K+ K- and phi to K long K short. It provides a wrapper for running fluka on a cluster. It provides scripts for processing fluka userdump files into feather and LHE files.
 
 # Prerequisites
 1. Register for a fluka account here https://fluka.cern/download/registration
