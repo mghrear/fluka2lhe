@@ -7,17 +7,17 @@ Converts fluka userdump output into an lhe file
 3. Install the neutron data library following instructions here https://fluka.cern/download/neutron-data-libraries
 
 # Running fluka2lhe
-## Step1: Modifying the fluka input card
+## Step1: Fluka input card
 Will update later
 
-## Step2: Modifying the mgdraw.f routine
+## Step2: mgdraw.f routine
 Will update later
 
-## Step3: Modifying the fluka2lhe-run.sh
+## Step3: run_fluka.sh
 Will update later
 
+## Step4: fluka2feather.py
+Will update later
 
-1. Compile the provided mgdraw_phiKK.f routine with the command: /path/to/fluka/bin/fff mgdraw_phiKK.f
-2. Create an executable with the command: /path/to/fluka/bin/lfluka -m fluka -o phiKK_exe  mgdraw_phiKK.o
-3. Run fluka with the command: /path/to/fluka/bin/rfluka -e phiKK_exe phiKK_4500.inp -M [number of statistically independent runs]
- 
+## Step5: feather2lhe.ipynb
+Will update later
