@@ -8,16 +8,16 @@ This repo uses fluka as a generator for photonuclear interactions. It provides i
 
 # Running fluka2lhe
 ## Step1: Fluka input card
-Will update later
+Create a fluka input card and put it in the input_cards directory. The examples already provided can be used as a template.
 
-## Step2: mgdraw.f routine
-Will update later
+## Step2: Routine for Fluka user-defined dump
+Create an mgdraw.f routine and put it in the mgdraw_scripts directory. The examples already provided can be used as a template.
 
-## Step3: run_fluka.sh
-Will update later
+## Step3: Running Fluka
+Modify top portion of either run-fluka.sh or sbatch-fluka.sh, as described in the comments. Source the .sh files to either run fluka or submit slurm jobs to run fluka. 
 
 ## Step4: fluka2feather.py
-Will update later
+Edit fluka_sim_dir and feather_name in fluka2feather.py and run it to convert the fluka files into a pandas dataframe which is saved in feather format.
 
 ## Step5: feather2lhe.ipynb
-Will update later
+feather2lhe.ipynb is an exploratory jupyter notebook for looking data in the the feather file. The notebook also demonstrates how the feather file can be processed into and LHE file.
