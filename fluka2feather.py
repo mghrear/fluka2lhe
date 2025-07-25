@@ -8,26 +8,30 @@ from pathlib import Path
 fluka_sim_dir = "/home/groups/laurenat/majd/fluka_sims/3740_MeV/"
 
 # Name of final feather file
-feather_name = "phiKK_3740_MeV.ftr"
+feather_name = "phiKK_3740_MeV"
 
 ####################################################################################
-
 
 
 # List all subdirectories, there should be a subdirectory for each seed
 #subdirs = [str(subdir) for subdir in Path(fluka_sim_dir).iterdir() if subdir.is_dir()]
 subdirs = ["/home/groups/laurenat/majd/fluka_sims/3740_MeV/1","/home/groups/laurenat/majd/fluka_sims/3740_MeV/2"]
 
+# Dataframe to store data
 df = pd.DataFrame()
 
-#Loop through subdirectories
+# fort 90 file counter
+n_files = 0 
+
+#Loop through subdirectories correspondng to different seeds
 for path in subdirs:
-	# Get list of paths the files with .90 extension
+
+	# For each subdirectory create a list of paths to .90 files
 	matching_files = fdt.find_files_with_extension(path, '.90')
 
 	for file_path in matching_files:
 		
-		print("readng: ", file_path)		
+		print("reading: ", file_path, " ...")		
 
 		# Convert file to a pandas dataframe
 		df_i = fdt.Fluka2Pandas(file_path)
@@ -35,4 +39,7 @@ for path in subdirs:
 		# Append to main dataframe
 		df = pd.concat([df, df_i], ignore_index=True)
 
-df.to_feather(fluka_sim_dir+feather_name)
+		# Increment file counter
+		n_files += 1
+
+df.to_feather(fluka_sim_dir+feather_name+str(n_files)+".ftr")
