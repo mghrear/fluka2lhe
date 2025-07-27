@@ -27,8 +27,8 @@ GEOEND
 ASSIGNMA    BLCKHOLE   BLKBODY
 ASSIGNMA      VACUUM      VOID
 ASSIGNMA    TUNGSTEN    TARGET
-PHOTONUC           2       0.0       0.0    VACUUM  TUNGSTEN       1.0
-LAM-BIAS         0.0 0.0000001              PHOTON       RAY       0.0
+PHOTONUC           2       0.0       0.0    VACUUM  TUNGSTEN       1.0ELECTNUC
+LAM-BIAS         0.0  0.000001            ELECTRON    PHOTON       0.0INEALL
 USERDUMP         100        90         0         1                    test_dump
 *Set the random number seed
 RANDOMIZ         1.0
