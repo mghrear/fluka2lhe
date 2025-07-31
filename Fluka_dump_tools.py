@@ -139,69 +139,116 @@ def find_files_with_extension(path, extension):
 
     return files_with_extension
 
-def write_lhe(df, output_dir, output_name, include_recoil_e = False, include_other_secondaries = False, elastic_only = False):
+def write_lhe(df, output_dir, output_name, include_recoil_e = True, include_other_secondaries = False, elastic_only = False):
 
+    # Filter events if only eleastic events are requested
     if elastic_only:
-        df = df.loc[df.NoSecondary == 2].reset_index(drop=True)
+        df = df.loc[( (df.ProjID == 7) & (df.NoSecondary == 2) ) | ( (df.ProjID == 3) & (df.NoSecondary == 3) )].reset_index(drop=True)
 
-
-    # Create lhe file and add header
+    # Create lhe file
     file = open(output_dir+'/'+output_name, "w")
 
-
-    rscale = 1.740000e+02
-    alpha_EM = 7.297353e-03  # Fine-structure constant
-    alpha_QCD = 1.078706E-01
+    # Constants for the LHE file
+    rscale = 1.740000e+02 
+    alpha_EM = 7.297353e-03
+    alpha_QCD = 1.078706E-01 
     beam_energy = 4.5
 
     #Write header 
     file.write(f"\n")
-
     file.write(f"<LesHouchesEvents version=\"3.0\">\n")
     file.write(f"<header>\n")
     file.write(f"#  Number of Events        :       "+str(len(df))+"\n")
     file.write(f"</header>\n")
 
-    # Write the body of the LHE file
+    # Write the init block
     file.write(f"<init>\n")
     file.write(f"{11} {623} {beam_energy:.6e} {rscale:.6e} {0} {0} {0} {0} {0} {1}\n")
     file.write("0 0 0 1\n")
     file.write(f"</init>\n")
 
 
-    # Loop through the DataFrame and write the lines to the file
+    # Loop through the DataFrame to write the event blocks
     for index, row in df.iterrows():
 
         # Start event block
         file.write(f"<event>\n")
 
+        # There are two caes:
+        # Case 1: ProjID == 7 (incoming particle is a photon)
+        # In this case, the recoil electron is omitted and must be inferred from the momentum of the incoming photon
+        if row.ProjID == 7:
 
-        if include_other_secondaries and include_recoil_e:
-            file.write(f"{1+row['NoSecondary']:>2}{1:>7} {0} {rscale:.8e} {alpha_EM:.8e} {alpha_QCD:.8e} \n")
-        elif include_other_secondaries and (include_recoil_e == False):
-            file.write(f"{row['NoSecondary']:>2}{1:>7} {0} {rscale:.8e} {alpha_EM:.8e} {alpha_QCD:.8e} \n")
-        elif (include_other_secondaries == False) and (include_recoil_e):
-            file.write(f"{3:>2}{1:>7} {0} {rscale:.8e} {alpha_EM:.8e} {alpha_QCD:.8e} \n")
-        else:
-            file.write(f"{2:>2}{1:>7} {0} {rscale:.8e} {alpha_EM:.8e} {alpha_QCD:.8e} \n")
+            if include_other_secondaries and include_recoil_e:
+                file.write(f"{1+row['NoSecondary']:>2}{1:>7} {0} {rscale:.8e} {alpha_EM:.8e} {alpha_QCD:.8e} \n")
 
-        # Include recoil electron if specified
-        if include_recoil_e:
-            file.write(f"{11:>9}{1:>3}{0:>5}{0:>5}{0:>5}{0:>5}{-row.ProjkE*row.ProjdirX:>+18.10e}{-row.ProjkE*row.ProjdirY:>+18.10e}{beam_energy-row.ProjkE*row.ProjdirZ:>+18.10e}{beam_energy-row.ProjkE:>17.10e}{5.11E-4:>17.10e}{0:>11.4e} {1:>.4e}\n")
+            elif include_other_secondaries and (include_recoil_e == False):
+                file.write(f"{row['NoSecondary']:>2}{1:>7} {0} {rscale:.8e} {alpha_EM:.8e} {alpha_QCD:.8e} \n")
+                
+            elif (include_other_secondaries == False) and (include_recoil_e):
+                file.write(f"{3:>2}{1:>7} {0} {rscale:.8e} {alpha_EM:.8e} {alpha_QCD:.8e} \n")
+            else:
+                file.write(f"{2:>2}{1:>7} {0} {rscale:.8e} {alpha_EM:.8e} {alpha_QCD:.8e} \n")
 
-        # Now include the secondaries
-        for PDG_ID, P, x, y, z, m, c in zip(row.PDG_IDs,row.Ps,row.dir_xs,row.dir_ys,row.dir_zs, row.Sec_mass, row.Sec_charge):
+            # Infer the recoil electron from the incoming photon if requested
+            if include_recoil_e:
+                file.write(f"{11:>9}{1:>3}{0:>5}{0:>5}{0:>5}{0:>5}{-row.ProjkE*row.ProjdirX:>+18.10e}{-row.ProjkE*row.ProjdirY:>+18.10e}{beam_energy-row.ProjkE*row.ProjdirZ:>+18.10e}{beam_energy-row.ProjkE:>17.10e}{5.11E-4:>17.10e}{0:>11.4e} {1:>.4e}\n")
 
-            # Inlcude all secondaries if specified
-            if include_other_secondaries:
-                if m != 0:  #If it's not a Photon E= m/sqrt(1-P^2/(P^2 + m^2))
+            # Now include the secondaries
+            for PDG_ID, P, x, y, z, m, c in zip(row.PDG_IDs,row.Ps,row.dir_xs,row.dir_ys,row.dir_zs, row.Sec_mass, row.Sec_charge):
+
+                # Inlcude all secondaries if requested
+                if include_other_secondaries:
+                    if m != 0:  #If it's not a Photon E= m/sqrt(1-P^2/(P^2 + m^2))
+                        file.write(f"{PDG_ID:>9}{1:>3}{0:>5}{0:>5}{0:>5}{0:>5}{P*x:>+18.10e}{P*y:>+18.10e}{P*z:>+18.10e}{m/np.sqrt(1-P**2/(m**2+P**2)):>17.10e}{m:>17.10e}{0:>11.4e} {0:>.4e}\n")
+                    else:       #If it is a Photon E = P 
+                        file.write(f"{PDG_ID:>9}{1:>3}{0:>5}{0:>5}{0:>5}{0:>5}{P*x:>+18.10e}{P*y:>+18.10e}{P*z:>+18.10e}{P:>17.10e}{m:>17.10e}{0:>11.4e} {0:>.4e}\n")
+                
+                # If all secondaries are not requested then only include the charged kaons
+                elif (PDG_ID == 321) or (PDG_ID == -321):
                     file.write(f"{PDG_ID:>9}{1:>3}{0:>5}{0:>5}{0:>5}{0:>5}{P*x:>+18.10e}{P*y:>+18.10e}{P*z:>+18.10e}{m/np.sqrt(1-P**2/(m**2+P**2)):>17.10e}{m:>17.10e}{0:>11.4e} {0:>.4e}\n")
-                else:       #If it is a Photon E = P 
-                    file.write(f"{PDG_ID:>9}{1:>3}{0:>5}{0:>5}{0:>5}{0:>5}{P*x:>+18.10e}{P*y:>+18.10e}{P*z:>+18.10e}{P:>17.10e}{m:>17.10e}{0:>11.4e} {0:>.4e}\n")
-            
-            # Otherwise only include the charged kaons
-            elif (PDG_ID == 321) or (PDG_ID == -321):
-                file.write(f"{PDG_ID:>9}{1:>3}{0:>5}{0:>5}{0:>5}{0:>5}{P*x:>+18.10e}{P*y:>+18.10e}{P*z:>+18.10e}{m/np.sqrt(1-P**2/(m**2+P**2)):>17.10e}{m:>17.10e}{0:>11.4e} {0:>.4e}\n")
+
+        # Case 2: ProjID == 3 (incoming particle is a electron)
+        # In this case, the recoil electron is the first secondary that is listed
+        elif row.ProjID == 3:
+
+            if include_other_secondaries and include_recoil_e:
+                file.write(f"{row['NoSecondary']:>2}{1:>7} {0} {rscale:.8e} {alpha_EM:.8e} {alpha_QCD:.8e} \n")
+
+            elif include_other_secondaries and (include_recoil_e == False):
+                file.write(f"{row['NoSecondary']-1:>2}{1:>7} {0} {rscale:.8e} {alpha_EM:.8e} {alpha_QCD:.8e} \n")
+                
+            elif (include_other_secondaries == False) and (include_recoil_e):
+                file.write(f"{3:>2}{1:>7} {0} {rscale:.8e} {alpha_EM:.8e} {alpha_QCD:.8e} \n")
+            else:
+                file.write(f"{2:>2}{1:>7} {0} {rscale:.8e} {alpha_EM:.8e} {alpha_QCD:.8e} \n")
+
+            # Now include the secondaries
+            sec_counter = 0
+            for PDG_ID, P, x, y, z, m, c in zip(row.PDG_IDs,row.Ps,row.dir_xs,row.dir_ys,row.dir_zs, row.Sec_mass, row.Sec_charge):
+
+                # The first secondary is the recoil electron, either skip it or write it
+                if sec_counter == 0:
+                    if include_recoil_e:
+                        file.write(f"{PDG_ID:>9}{1:>3}{0:>5}{0:>5}{0:>5}{0:>5}{P*x:>+18.10e}{P*y:>+18.10e}{P*z:>+18.10e}{m/np.sqrt(1-P**2/(m**2+P**2)):>17.10e}{m:>17.10e}{0:>11.4e} {0:>.4e}\n")
+                        sec_counter += 1
+                        continue
+                    else:
+                        sec_counter += 1
+                        continue
+                
+                sec_counter += 1
+
+                # Inlcude all secondaries if requested
+                if include_other_secondaries:
+                    if m != 0:  #If it's not a Photon E= m/sqrt(1-P^2/(P^2 + m^2))
+                        file.write(f"{PDG_ID:>9}{1:>3}{0:>5}{0:>5}{0:>5}{0:>5}{P*x:>+18.10e}{P*y:>+18.10e}{P*z:>+18.10e}{m/np.sqrt(1-P**2/(m**2+P**2)):>17.10e}{m:>17.10e}{0:>11.4e} {0:>.4e}\n")
+                    else:       #If it is a Photon E = P 
+                        file.write(f"{PDG_ID:>9}{1:>3}{0:>5}{0:>5}{0:>5}{0:>5}{P*x:>+18.10e}{P*y:>+18.10e}{P*z:>+18.10e}{P:>17.10e}{m:>17.10e}{0:>11.4e} {0:>.4e}\n")
+                
+                # If all secondaries are not requested then only include the charged kaons
+                elif (PDG_ID == 321) or (PDG_ID == -321):
+                    file.write(f"{PDG_ID:>9}{1:>3}{0:>5}{0:>5}{0:>5}{0:>5}{P*x:>+18.10e}{P*y:>+18.10e}{P*z:>+18.10e}{m/np.sqrt(1-P**2/(m**2+P**2)):>17.10e}{m:>17.10e}{0:>11.4e} {0:>.4e}\n")
 
         # end event block
         file.write(f"</event>\n")
