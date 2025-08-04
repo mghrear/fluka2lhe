@@ -4,14 +4,14 @@
 FLUKA_PATH="/home/groups/laurenat/majd/fluka4-5.0"
 
 # Specifiy durectory where simulations are output
-TARGET_DIR="/home/groups/laurenat/majd/fluka_sims/4550_MeV"
+TARGET_DIR="/home/groups/laurenat/majd/fluka_sims/KLKS/4550_MeV"
 
 # Select mgdraw script and fluka input card to use
-mgdraw_script="mgdraw_phiKK.f"
+mgdraw_script="mgdraw_phiKLKS.f"
 input_card="phiKK_4550.inp"
 
 # Define the range for random seeds
-SEED_START=501	# Starting seed number
+SEED_START=0	# Starting seed number
 SEED_END=1000	# Ending seed number
 
 # Define the number of statistically independent runs per seed
@@ -21,7 +21,7 @@ Num_runs=10
 f2l_path="/home/groups/laurenat/majd/fluka2lhe"
 
 # Select sbatch settings
-sbatch_time="12:00:00" # Time limit (HH:MM:SS)
+sbatch_time="40:00:00" # Time limit (HH:MM:SS)
 sbatch_partition="normal"
 sbatch_ntasks="1"
 sbatch_cpus_per_task="1"

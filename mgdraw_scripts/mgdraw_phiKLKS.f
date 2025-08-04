@@ -30,7 +30,7 @@
       INCLUDE 'resnuc.inc'
       INCLUDE 'sumcou.inc'
       INCLUDE 'trackr.inc'
-      LOGICAL :: found_16, found_15
+      LOGICAL :: found_12, found_19
 
 *
 *----------------------------------------------------------------------*

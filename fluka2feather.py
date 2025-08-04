@@ -5,18 +5,19 @@ import os
 from pathlib import Path
 
 # Path of directory with fluka simulations to convert
-fluka_sim_dir = "/home/groups/laurenat/majd/fluka_sims/4550_MeV/"
+fluka_sim_dir = "/home/groups/laurenat/majd/fluka_sims/3740_MeV/"
 
 # Name of final feather file
-feather_name = "phiKK_4550_MeV"
+feather_name = "phiKK_3740_MeV"
 
 ####################################################################################
 
 # List all subdirectories, there should be a subdirectory for each seed
 subdirs = [str(subdir) for subdir in Path(fluka_sim_dir).iterdir() if subdir.is_dir()]
 
-# Dataframe to store data
-df = pd.DataFrame()
+# List to store dataframes
+dataframes = []
+
 
 # fort 90 file counter
 n_files = 0 
@@ -28,16 +29,23 @@ for path in subdirs:
 	matching_files = fdt.find_files_with_extension(path, '.90')
 
 	for file_path in matching_files:
-		
-		print("reading: ", file_path, " ...")		
 
-		# Convert file to a pandas dataframe
-		df_i = fdt.Fluka2Pandas(file_path)
+		try:
+			print("reading: ", file_path, " ...")		
 
-		# Append to main dataframe
-		df = pd.concat([df, df_i], ignore_index=True)
+			# Convert file to a pandas dataframe
+			df_i = fdt.Fluka2Pandas(file_path)
 
-		# Increment file counter
-		n_files += 1
+			# Append to the list of dataframes
+			dataframes.append(df_i)
 
+			# Increment file counter
+			n_files += 1
+
+		except Exception as e:
+			print(f"Error reading {file_path}: {e}")
+
+# Concatenate all dataframes and save
+df = pd.concat(dataframes, ignore_index=True)
 df.to_feather(fluka_sim_dir+feather_name+"_"+str(n_files)+"_files.ftr")
+
