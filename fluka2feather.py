@@ -5,10 +5,10 @@ import os
 from pathlib import Path
 
 # Path of directory with fluka simulations to convert
-fluka_sim_dir = "/home/groups/laurenat/majd/fluka_sims/3740_MeV/"
+fluka_sim_dir = "/home/groups/laurenat/majd/fluka_sims/KLKS/4550_MeV"
 
 # Name of final feather file
-feather_name = "phiKK_3740_MeV"
+feather_name = "phiKLKS_4550_MeV"
 
 ####################################################################################
 
